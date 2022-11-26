@@ -42,30 +42,44 @@ namespace ShinDataUtil.Decompression
                     var texData = TXPLData.Slice((int)texInfo.offset, (int)texInfo.size);
 
                     //Also in "Umineko: Golden Fantasia" there are DDS stored in this format
+                    //TODO: make DDS <=> PNG conversion (or just DDS extraction? As it can be edited quite easily)
                     var texHeader = MemoryMarshal.Read<TexHeader>(texData);
-                    var image = DungeonTexDecoder.DecodeTex(texData);
-                    texHeaders.Add(texHeader);
+                    bool isDDS = texHeader.Magic == 0x20534444;//DDS 32
 
-                    var pngPath = Path.Combine(outname, $"{index:000}.png");
-                    FastPngEncoder.WritePngToFile(pngPath, image);
-                    
-                    if (extractSprites)
+                    if (isDDS) 
                     {
-                        Console.WriteLine($"Saving sprites from texture {index}...");
+                        Console.WriteLine($"texture {index} is DDS, saving raw");
+                        var ddsPath = Path.Combine(outname, $"{index:000}.dds");
 
-                        var spriteDirPath = Path.Combine(outname, $"{index:000}");
-                        Directory.CreateDirectory(spriteDirPath);
+                        File.WriteAllBytes(ddsPath, texData.ToArray());
+                        texHeaders.Add(texHeader); //Currently wrong
+                    }
+                    else
+                    {
+                        var image = DungeonTexDecoder.DecodeTex(texData);
+                        texHeaders.Add(texHeader);
 
-                        
-                        foreach (var (sprIndex, sprite) in spritesInfo.Where((x) => x.texNum == index).Select((x, i) => (i, x)))
+                        var pngPath = Path.Combine(outname, $"{index:000}.png");
+                        FastPngEncoder.WritePngToFile(pngPath, image);
+
+                        if (extractSprites)
                         {
-                            var img = image.Clone();
-                            var spriteRect = new Rectangle(sprite.x, sprite.y, sprite.width, sprite.height);
-                            img.Mutate(ctx => ctx.Crop(spriteRect));
+                            Console.WriteLine($"Saving sprites from texture {index}...");
 
-                            var spritePath = Path.Combine(spriteDirPath, $"{sprIndex:000}.png");
+                            var spriteDirPath = Path.Combine(outname, $"{index:000}");
+                            Directory.CreateDirectory(spriteDirPath);
 
-                            FastPngEncoder.WritePngToFile(spritePath, img);
+
+                            foreach (var (sprIndex, sprite) in spritesInfo.Where((x) => x.texNum == index).Select((x, i) => (i, x)))
+                            {
+                                var img = image.Clone();
+                                var spriteRect = new Rectangle(sprite.x, sprite.y, sprite.width, sprite.height);
+                                img.Mutate(ctx => ctx.Crop(spriteRect));
+
+                                var spritePath = Path.Combine(spriteDirPath, $"{sprIndex:000}.png");
+
+                                FastPngEncoder.WritePngToFile(spritePath, img);
+                            }
                         }
                     }
                 }
