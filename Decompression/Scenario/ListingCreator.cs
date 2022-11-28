@@ -140,10 +140,14 @@ namespace ShinDataUtil.Decompression.Scenario
                         PostfixExpression.Operation.Divide => "/",
                         PostfixExpression.Operation.Remainder => "%",
                         PostfixExpression.Operation.Equals => "==",
+                        PostfixExpression.Operation.BothNotEqualToZero => "bnz",
                         PostfixExpression.Operation.Greater => ">",
+                        PostfixExpression.Operation.GreaterOrEqual => ">=",
                         PostfixExpression.Operation.Less => "<",
+                        PostfixExpression.Operation.LessOrEqual => "<=",
                         PostfixExpression.Operation.Negate => "neg",
                         PostfixExpression.Operation.AbsoluteValue => "abs",
+                        PostfixExpression.Operation.SelectTwo => "slt",
                         PostfixExpression.Operation.BitwiseAnd => "&",
                         PostfixExpression.Operation.BitwiseNot => "~",
                         PostfixExpression.Operation.BitwiseOr => "|",
@@ -162,6 +166,17 @@ namespace ShinDataUtil.Decompression.Scenario
             return sb.ToString();
         }
         
+        private string FormatStringNumberOption(dynamic data)
+        {
+            return data switch
+            {
+                NumberSpec => FormatNumber(data),
+                string => $"L{FormatString(data)}",
+                byte => $"{data}b",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
         private string FormatElement(Opcode opcode, int index, OpcodeEncodingElement element, dynamic data)
         {
             return element switch
@@ -176,10 +191,15 @@ namespace ShinDataUtil.Decompression.Scenario
                 OpcodeEncodingElement.JumpOffset => FormatJumpOffset(data),
                 OpcodeEncodingElement.AddressArray => $"a[{string.Join(",", ((ImmutableArray<ushort>) data).Select(NumberSpec.FromAddress).Select(FormatNumber))}]",
                 OpcodeEncodingElement.StringArray => $"S[{string.Join(",", ((ImmutableArray<string>)data).Select(FormatString))}]",
+                OpcodeEncodingElement.StringNumberOption => $"snopt{{{FormatStringNumberOption(data)}}}",
                 OpcodeEncodingElement.NumberArray =>
                 $"n[{string.Join(",", ((ImmutableArray<NumberSpec>) data).Select(FormatNumber))}]",
                 OpcodeEncodingElement.JumpOffsetArray =>
                 $"j[{string.Join(",", ((ImmutableArray<int>) data).Select(FormatJumpOffset))}]",
+                OpcodeEncodingElement.ShortArray =>
+                $"s[{string.Join(",", (ImmutableArray<ushort>)data)}]",
+                OpcodeEncodingElement.IntArray =>
+                $"i[{string.Join(",", (ImmutableArray<uint>)data)}]",
                 OpcodeEncodingElement.PostfixNotationExpression => $"rpne{{{FormatPostfixExpression(data)}}}",
                 OpcodeEncodingElement.BitmappedNumberArguments => 
                 $"bmn[{string.Join(",", ((ImmutableArray<NumberSpec>) data).Select(FormatNumber))}]",

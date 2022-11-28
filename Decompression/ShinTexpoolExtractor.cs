@@ -16,6 +16,11 @@ namespace ShinDataUtil.Decompression
     {
         public static void Extract(string inTXPL, string outname, bool extractSprites)
         {
+            Console.WriteLine(
+                "WARNING: there are both old (.txl) and new (.tlz) TXPL formats in game files.\n" +
+                "For now please use konosuba branch version for extracting old ones"
+            );
+
             var TXPLData = new ReadOnlySpan<byte>(File.ReadAllBytes(inTXPL));
 
             if (ShinLZLRDecompressor.CheckHeader(ref TXPLData))
@@ -30,6 +35,9 @@ namespace ShinDataUtil.Decompression
 
             var texturesInfo = MemoryMarshal.Cast<byte, TXPL.TexData>(header.GetTexInfoData(TXPLData));
             var texpoolInfo = MemoryMarshal.Read<TXPL.TexpoolInfo>(header.GetTexpoolInfoData(TXPLData));
+
+            Trace.Assert(texpoolInfo.Magic == TXPL.TexpoolInfo.DefaultMagic);
+
             var spritesInfo = MemoryMarshal.Cast<byte, TXPL.Sprite>(header.GetSpriteInfoData(TXPLData)).ToArray();
 
             var texHeaders = new List<TexHeader>();
@@ -85,7 +93,7 @@ namespace ShinDataUtil.Decompression
                 }
             }
 
-            var desc = new TXPL.Description(texpoolInfo.texWidth, texpoolInfo.texHeight, texHeaders.ToArray(), spritesInfo);
+            var desc = new TXPL.Description(texpoolInfo.texDepth, texpoolInfo.texWidth, texpoolInfo.texHeight, texHeaders.ToArray(), spritesInfo);
 
             var options = new JsonSerializerOptions();
             options.WriteIndented = true;

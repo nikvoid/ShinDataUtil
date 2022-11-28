@@ -12,12 +12,15 @@ namespace ShinDataUtil.Scenario
         AddressArray,
         NumberArray,
         JumpOffsetArray,
+        ShortArray,
+        IntArray,
         String,
         LongString,
         StringArray,
+        StringNumberOption,     /* string or number or none */
         BitmappedNumberArguments,
         PostfixNotationExpression,
-        
+
         MessageId,
 
         UnaryOperationArgument, /* It's very odd anyway */

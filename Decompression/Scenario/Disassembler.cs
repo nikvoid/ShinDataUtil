@@ -222,11 +222,23 @@ namespace ShinDataUtil.Decompression.Scenario
                 case OpcodeEncodingElement.NumberArray:
                     return Enumerable.Range(0, FeedByte()).Select(_ => FeedNumber()).ToImmutableArray();
                 case OpcodeEncodingElement.JumpOffsetArray:
-                    var sz = FeedShort();
-                    return Enumerable.Range(0, sz).Select(_ => FeedOffset()).ToImmutableArray();
+                    return Enumerable.Range(0, FeedShort()).Select(_ => FeedOffset()).ToImmutableArray();
+                case OpcodeEncodingElement.ShortArray:
+                    return Enumerable.Range(0, FeedShort()).Select(_ => FeedShort()).ToImmutableArray();
+                case OpcodeEncodingElement.IntArray:
+                    return Enumerable.Range(0, FeedShort()).Select(_ => FeedInt()).ToImmutableArray();
+
                 case OpcodeEncodingElement.String: return FeedString();
                 case OpcodeEncodingElement.LongString: return FeedLongString();
                 case OpcodeEncodingElement.StringArray: return FeedStringArray();
+                case OpcodeEncodingElement.StringNumberOption:
+                    tempByte = FeedByte();
+                    if (tempByte == 0)
+                        return FeedNumber();
+                    if (tempByte > 2)
+                            return tempByte;
+                    else
+                        return FeedString();
                 case OpcodeEncodingElement.BitmappedNumberArguments:
                     tempByte = FeedByte();
                     /* TODO: check if all of the opcodes have zero as default */

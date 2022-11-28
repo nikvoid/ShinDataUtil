@@ -17,7 +17,7 @@ namespace ShinDataUtil.Common
 
             public static uint HeaderSize => sizeof(int) * 3;
 
-            public static uint DefaultMagic => 0x4C505854;
+            public static uint DefaultMagic => 0x4C505854; // TXPL
             public ReadOnlySpan<byte> GetTexInfoData(ReadOnlySpan<byte> txplData) =>
                 txplData.Slice(checked((int)HeaderSize), checked((int)(TexpoolInfoOffset - HeaderSize)));
 
@@ -31,12 +31,15 @@ namespace ShinDataUtil.Common
 
         public struct TexpoolInfo
         {
+            public uint Magic;
+            public uint texDepth; // probably
             public uint texWidth;
             public uint texHeight;
             public uint texCount;
             public uint spriteCount;
 
-            public static uint SelfSize => sizeof(uint) * 4;
+            public static uint SelfSize => sizeof(uint) * 6;
+            public static uint DefaultMagic => 0x32544C50; // PLT2
         }
 
         public struct TexData
@@ -74,13 +77,16 @@ namespace ShinDataUtil.Common
 
         public class Description
         {
+            public uint texDepth { get; set; }
             public uint texWidth { get; set; }
             public uint texHeight { get; set; }
             public TexMetadata[] texMetadatas { get; set; }
             public Sprite[] sprites { get; set; }
 
             [JsonConstructor]
-            public Description(uint texWidth, uint texHeight, TexMetadata[] texMetadatas, Sprite[] sprites) {
+            public Description(uint texDepth, uint texWidth, uint texHeight, TexMetadata[] texMetadatas, Sprite[] sprites) 
+            {
+                this.texDepth = texDepth;
                 this.texWidth = texWidth;
                 this.texHeight = texHeight;
 
@@ -88,8 +94,9 @@ namespace ShinDataUtil.Common
                 this.texMetadatas = texMetadatas;
             }
 
-            public Description(uint texWidth, uint texHeight, TexHeader[] textures, Sprite[] sprites)
+            public Description(uint texDepth, uint texWidth, uint texHeight, TexHeader[] textures, Sprite[] sprites)
             {
+                this.texDepth = texDepth;
                 this.texWidth = texWidth;
                 this.texHeight = texHeight;
 

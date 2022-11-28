@@ -23,6 +23,10 @@ namespace ShinDataUtil.Scenario
         /// Reverse polish notation-encoded expression
         /// </summary>
         exp = 66,
+
+        unk44 = 68,
+        unk45 = 69,
+
         /// <summary>
         /// Jump conditional
         /// </summary>
@@ -48,7 +52,7 @@ namespace ShinDataUtil.Scenario
         /// </summary>
         callt = 75,
         
-        /// <summary>
+        /// <summary>ou
         /// Generate a pseudo-random number. Destination address is in the first argument. Second and third give boundaries.
         /// </summary>
         rnd = 76,
@@ -86,14 +90,24 @@ namespace ShinDataUtil.Scenario
         BGMPLAY = 144,
         BGMSTOP = 145,
         BGMVOL = 146,
+        BGMWAIT = 147,
+        BGMSYNC = 148,
+
         SEPLAY = 149,
         SESTOP = 150,
         SESTOPALL = 151,
         SEVOL = 152,
+        SEPAN = 153,
         SEWAIT = 154,
         SEONCE = 155,
         VOICEPLAY = 156,
+        VOICESTOP = 157,
         VOICEWAIT = 158,
+
+        BGMLOAD = 160,
+        BGMSAVE = 161,
+
+        LAYERINIT = 192,
         LAYERLOAD = 193,
         LAYERUNLOAD = 194,
         LAYERCTRL = 195,
@@ -103,6 +117,7 @@ namespace ShinDataUtil.Scenario
         MOVIEWAIT = 199,
         SLEEP = 224,
         VSET = 225,
+        STATSHOW = 226,
         DEBUGOUT = 255           // doc'ed
     }
 }
