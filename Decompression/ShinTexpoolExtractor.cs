@@ -32,7 +32,7 @@ namespace ShinDataUtil.Decompression
             var texpoolInfo = MemoryMarshal.Read<TXPL.TexpoolInfo>(header.GetTexpoolInfoData(TXPLData));
             var spritesInfo = MemoryMarshal.Cast<byte, TXPL.Sprite>(header.GetSpriteInfoData(TXPLData)).ToArray();
 
-            var texHeaders = new List<TexHeader>();
+            var texHeaders = new List<(TexHeader, bool)>();
 
             foreach (var (index, texInfo) in texturesInfo.ToArray().Select((x, i) => (i, x)))
             {
@@ -52,12 +52,12 @@ namespace ShinDataUtil.Decompression
                         var ddsPath = Path.Combine(outname, $"{index:000}.dds");
 
                         File.WriteAllBytes(ddsPath, texData.ToArray());
-                        texHeaders.Add(texHeader); //Currently wrong
+                        texHeaders.Add((texHeader, true));
                     }
                     else
                     {
                         var image = DungeonTexDecoder.DecodeTex(texData);
-                        texHeaders.Add(texHeader);
+                        texHeaders.Add((texHeader, false));
 
                         var pngPath = Path.Combine(outname, $"{index:000}.png");
                         FastPngEncoder.WritePngToFile(pngPath, image);

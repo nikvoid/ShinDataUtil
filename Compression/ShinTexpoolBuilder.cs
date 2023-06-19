@@ -1,12 +1,15 @@
 ﻿using BCnEncoder.Encoder;
+using Microsoft.Toolkit.HighPerformance;
 using ShinDataUtil.Common;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using static ShinDataUtil.Common.TXPL;
 
 namespace ShinDataUtil.Compression
 {
@@ -55,14 +58,19 @@ namespace ShinDataUtil.Compression
             var encoder = new BcEncoder();
             foreach (var (index, texture) in desc.texMetadatas.Select((x, i) => (i, x)))
             {
-                var texPath = Path.Combine(indir, $"{index:000}.png");
-
-
-                var image = Image.Load<Rgba32>(texPath);
-
-                Trace.Assert(image.Width == desc.texWidth && image.Height == desc.texHeight);
-
-                var texData = DungeonTexEncoder.Encode(image, texture.format, texture.levels);
+                byte[] texData;
+                if (texture.is_dds)
+                {
+                    var texPath = Path.Combine(indir, $"{index:000}.dds");
+                    texData = File.ReadAllBytes(texPath);
+                }
+                else
+                {
+                    var texPath = Path.Combine(indir, $"{index:000}.png");
+                    var image = Image.Load<Rgba32>(texPath);
+                    Trace.Assert(image.Width == desc.texWidth && image.Height == desc.texHeight);
+                    texData = DungeonTexEncoder.Encode(image, texture.format, texture.levels).ToArray();
+                }
 
                 var texInfo = new TXPL.TexData();
                 texInfo.offset = (uint)outStream.Position;

@@ -62,14 +62,16 @@ namespace ShinDataUtil.Common
 
         public struct TexMetadata
         {
-            public TexMetadata(NVNTexFormat format, uint levels)
+            public TexMetadata(NVNTexFormat format, uint levels, bool is_dds)
             {
                 this.format = format;
                 this.levels = levels;
+                this.is_dds = is_dds;
             }
 
             public NVNTexFormat format { get; set; }
             public uint levels { get; set; }
+            public bool is_dds { get; set; }
         }
 
         public class Description
@@ -88,13 +90,13 @@ namespace ShinDataUtil.Common
                 this.texMetadatas = texMetadatas;
             }
 
-            public Description(uint texWidth, uint texHeight, TexHeader[] textures, Sprite[] sprites)
+            public Description(uint texWidth, uint texHeight, (TexHeader, bool)[] textures, Sprite[] sprites)
             {
                 this.texWidth = texWidth;
                 this.texHeight = texHeight;
 
                 this.sprites = sprites;
-                texMetadatas = textures.Select(x => new TexMetadata(x.Format, x.Levels)).ToArray();
+                texMetadatas = textures.Select(x => new TexMetadata(x.Item1.Format, x.Item1.Levels, x.Item2)).ToArray();
             }
         }
     }
